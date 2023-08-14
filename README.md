@@ -293,3 +293,141 @@ BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("test.txt", tr
  bufferedWriter.newLine();
  bufferedWriter.close();
 ```
+
+## 练习:文本排序
+
+请将文本信息恢复顺序。
+
+```
+3.侍中、侍郎郭攸之、费祎、董允等，此皆良实，志虑忠纯，是以先帝简拔以遗陛下。愚以为宫中之事，事无大小，悉以咨之，然后施行，必得裨补阙漏，有所广益。
+8.愿陛下托臣以讨贼兴复之效，不效，则治臣之罪，以告先帝之灵。若无兴德之言，则责攸之、祎、允等之慢，以彰其咎；陛下亦宜自谋，以咨诹善道，察纳雅言，深追先帝遗诏，臣不胜受恩感激。
+4.将军向宠，性行淑均，晓畅军事，试用之于昔日，先帝称之曰能，是以众议举宠为督。愚以为营中之事，悉以咨之，必能使行阵和睦，优劣得所。
+2.宫中府中，俱为一体，陟罚臧否，不宜异同。若有作奸犯科及为忠善者，宜付有司论其刑赏，以昭陛下平明之理，不宜偏私，使内外异法也。
+1.先帝创业未半而中道崩殂，今天下三分，益州疲弊，此诚危急存亡之秋也。然侍卫之臣不懈于内，忠志之士忘身于外者，盖追先帝之殊遇，欲报之于陛下也。诚宜开张圣听，以光先帝遗德，恢弘志士之气，不宜妄自菲薄，引喻失义，以塞忠谏之路也。
+9.今当远离，临表涕零，不知所言。
+6.臣本布衣，躬耕于南阳，苟全性命于乱世，不求闻达于诸侯。先帝不以臣卑鄙，猥自枉屈，三顾臣于草庐之中，咨臣以当世之事，由是感激，遂许先帝以驱驰。后值倾覆，受任于败军之际，奉命于危难之间，尔来二十有一年矣。
+7.先帝知臣谨慎，故临崩寄臣以大事也。受命以来，夙夜忧叹，恐付托不效，以伤先帝之明，故五月渡泸，深入不毛。今南方已定，兵甲已足，当奖率三军，北定中原，庶竭驽钝，攘除奸凶，兴复汉室，还于旧都。此臣所以报先帝而忠陛下之职分也。至于斟酌损益，进尽忠言，则攸之、祎、允之任也。
+5.亲贤臣，远小人，此先汉所以兴隆也；亲小人，远贤臣，此后汉所以倾颓也。先帝在时，每与臣论此事，未尝不叹息痛恨于桓、灵也。侍中、尚书、长史、参军，此悉贞良死节之臣，愿陛下亲之信之，则汉室之隆，可计日而待也。
+```
+
+### 案例分析
+
+1. 逐行读取文本信息。
+2. 把读取到的文本存储到集合中
+3. 对集合中的文本进行排序
+4. 遍历集合，按顺序，写出文本信息。
+
+### 案例实现
+
+```java
+public class Demo05Test {
+    public static void main(String[] args) throws IOException {
+        //1.创建ArrayList集合,泛型使用String
+        ArrayList<String> list = new ArrayList<>();
+        //2.创建BufferedReader对象,构造方法中传递FileReader对象
+        BufferedReader br = new BufferedReader(new FileReader("10_IO\\in.txt"));
+        //3.创建BufferedWriter对象,构造方法中传递FileWriter对象
+        BufferedWriter bw = new BufferedWriter(new FileWriter("10_IO\\out.txt"));
+        //4.使用BufferedReader对象中的方法readLine,以行的方式读取文本
+        String line;
+        while((line = br.readLine())!=null){
+            //5.把读取到的文本存储到ArrayList集合中
+            list.add(line);
+        }
+        //6.使用Collections集合工具类中的方法sort,对集合中的元素按照自定义规则排序
+        Collections.sort(list, new Comparator<String>() {
+            /*
+                o1-o2:升序
+                o2-o1:降序
+             */
+            @Override
+            public int compare(String o1, String o2) {
+                //依次比较集合中两个元素的首字母,升序排序
+                return o1.charAt(0)-o2.charAt(0);
+            }
+        });
+        //7.遍历ArrayList集合,获取每一个元素
+        for (String s : list) {
+            //8.使用BufferedWriter对象中的方法wirte,把遍历得到的元素写入到文本中(内存缓冲区中)
+            bw.write(s);
+            //9.写换行
+            bw.newLine();
+        }
+        //10.释放资源
+        bw.close();
+        br.close();
+    }
+}
+```
+
+# 转换流
+
+## 字符集
+
+* **字符集 `Charset`**：也叫编码表。是一个系统支持的所有字符的集合，包括各国家文字、标点符号、图形符号、数字等。
+
+计算机要准确的存储和识别各种字符集符号，需要进行字符编码，一套字符集必然至少有一套字符编码。常见字符集有ASCII字符集、GBK字符集、Unicode字符集等。![](/Users/joey/Downloads/资料/day29-IO（其他流）/笔记/img/1_charset.jpg)
+
+可见，当指定了**编码**，它所对应的**字符集**自然就指定了，所以**编码**才是我们最终要关心的。
+
+* **ASCII字符集** ：
+  * ASCII（American Standard Code for Information Interchange，美国信息交换标准代码）是基于拉丁字母的一套电脑编码系统，用于显示现代英语，主要包括控制字符（回车键、退格、换行键等）和可显示字符（英文大小写字符、阿拉伯数字和西文符号）。
+  * 基本的ASCII字符集，使用7位（bits）表示一个字符，共128字符。ASCII的扩展字符集使用8位（bits）表示一个字符，共256字符，方便支持欧洲常用字符。
+* **ISO-8859-1字符集**：
+  * 拉丁码表，别名Latin-1，用于显示欧洲使用的语言，包括荷兰、丹麦、德语、意大利语、西班牙语等。
+  * ISO-8859-1使用单字节编码，兼容ASCII编码。
+* **GBxxx字符集**：
+  * GB就是国标的意思，是为了显示中文而设计的一套字符集。
+  * **GB2312**：简体中文码表。一个小于127的字符的意义与原来相同。但两个大于127的字符连在一起时，就表示一个汉字，这样大约可以组合了包含7000多个简体汉字，此外数学符号、罗马希腊的字母、日文的假名们都编进去了，连在ASCII里本来就有的数字、标点、字母都统统重新编了两个字节长的编码，这就是常说的"全角"字符，而原来在127号以下的那些就叫"半角"字符了。
+  * **GBK**：最常用的中文码表。是在GB2312标准基础上的扩展规范，使用了双字节编码方案，共收录了21003个汉字，完全兼容GB2312标准，同时支持繁体汉字以及日韩汉字等。
+  * **GB18030**：最新的中文码表。收录汉字70244个，采用多字节编码，每个字可以由1个、2个或4个字节组成。支持中国国内少数民族的文字，同时支持繁体汉字以及日韩汉字等。
+* **Unicode字符集** ：
+  * Unicode编码系统为表达任意语言的任意字符而设计，是业界的一种标准，也称为统一码、标准万国码。
+  * 它最多使用4个字节的数字来表达每个字母、符号，或者文字。有三种编码方案，UTF-8、UTF-16和UTF-32。最为常用的UTF-8编码。
+  * UTF-8编码，可以用来表示Unicode标准中任何字符，它是电子邮件、网页及其他存储或传送文字的应用中，优先采用的编码。互联网工程工作小组（IETF）要求所有互联网协议都必须支持UTF-8编码。所以，我们开发Web应用，也要使用UTF-8编码。它使用一至四个字节为每个字符编码，编码规则：
+    1. 128个US-ASCII字符，只需一个字节编码。
+    2. 拉丁文等字符，需要二个字节编码。 
+    3. 大部分常用字（含中文），使用三个字节编码。
+    4. 其他极少使用的Unicode辅助字符，使用四字节编码。
+
+## InputStreamReader
+
+* `InputStreamReader(InputStream in)`: 创建一个使用默认字符集的字符流。 
+* `InputStreamReader(InputStream in, String charsetName)`: 创建一个指定字符集的字符流。
+
+### 指定编码读取
+
+```java
+FileReader reader = new FileReader("test.txt", Charset.forName("GBK"));
+int ch;
+while ((ch = reader.read()) != -1) {
+    System.out.println((char) ch);
+}
+reader.close();
+```
+
+## OutputStreamWriter类
+
+- `OutputStreamWriter(OutputStream in)`: 创建一个使用默认字符集的字符流。 
+- `OutputStreamWriter(OutputStream in, String charsetName)`: 创建一个指定字符集的字符流。
+
+```java
+// 定义文件路径
+String FileName = "E:\\out.txt";
+// 创建流对象,默认UTF8编码
+OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(FileName));
+// 写出数据
+osw.write("你好"); // 保存为6个字节
+osw.close();
+// 定义文件路径
+String FileName2 = "E:\\out2.txt";
+// 创建流对象,指定GBK编码
+OutputStreamWriter osw2 = new OutputStreamWriter(new FileOutputStream(FileName2),"GBK");
+// 写出数据
+osw2.write("你好");// 保存为4个字节
+osw2.close();
+```
+
+### 转换流理解图解
+
+**转换流是字节与字符间的桥梁！**![](/Users/joey/Downloads/资料/day29-IO（其他流）/笔记/img/2_zhuanhuan.jpg)

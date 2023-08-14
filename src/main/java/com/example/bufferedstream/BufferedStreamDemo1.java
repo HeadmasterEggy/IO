@@ -1,4 +1,4 @@
-package com.bufferedstream;
+package com.example.bufferedstream;
 
 import java.io.*;
 import java.nio.file.Files;
