@@ -430,4 +430,5 @@ osw2.close();
 
 ### 转换流理解图解
 
-**转换流是字节与字符间的桥梁！**![](/Users/joey/Downloads/资料/day29-IO（其他流）/笔记/img/2_zhuanhuan.jpg)
+**转换流是字节与字符间的桥梁！**![2_zhuanhuan.jpg](img%2F2_zhuanhuan.jpg)
+
