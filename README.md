@@ -227,3 +227,71 @@ fileWriter.close();
     fw.write('闭'); // 继续写出第2个字符,【报错】java.io.IOException: Stream closed
     fw.close();
 ```
+
+# 缓冲流
+
+缓冲流,也叫高效流，是对4个基本的`FileXxx` 流的增强，所以也是4个流，按照数据类型分类：
+
+* **字节缓冲流**：`BufferedInputStream`，`BufferedOutputStream` 
+* **字符缓冲流**：`BufferedReader`，`BufferedWriter`
+
+缓冲流的基本原理，是在创建流对象时，会创建一个内置的默认大小的缓冲区数组，通过缓冲区读写，减少系统IO次数，从而提高读写的效率。
+
+## 字节缓冲流
+
+* `public BufferedInputStream(InputStream in)` ：创建一个 新的缓冲输入流。 
+* `public BufferedOutputStream(OutputStream out)`： 创建一个新的缓冲输出流。
+
+### 读写字节
+
+```java
+BufferedInputStream bufferedInputStream = new BufferedInputStream(Files.newInputStream(Paths.get("test.txt")));
+BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(Files.newOutputStream(Paths.get("copy.txt")));
+int b;
+while((b = bufferedInputStream.read()) != -1) {
+    bufferedOutputStream.write(b);
+}
+bufferedOutputStream.close();
+bufferedInputStream.close();
+```
+
+### 读写数组
+
+```java
+BufferedInputStream bufferedInputStream = new BufferedInputStream(Files.newInputStream(Paths.get("test.txt")));
+BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(Files.newOutputStream(Paths.get("copy2.txt")));
+byte[] bytes = new byte[1024];
+int len;
+while((len = bufferedInputStream.read(bytes)) != -1) {
+    bufferedOutputStream.write(bytes, 0, len);
+}
+bufferedOutputStream.close();
+bufferedInputStream.close();
+```
+
+## 字符缓冲流
+
+* `public BufferedReader(Reader in)` ：创建一个 新的缓冲输入流。 
+* `public BufferedWriter(Writer out)`： 创建一个新的缓冲输出流。
+
+```java
+BufferedReader bufferedReader = new BufferedReader(new FileReader("test.txt"));
+String line;
+while((line = bufferedReader.readLine()) != null){
+    System.out.println(line);
+}
+bufferedReader.close();
+```
+
+`newLine()`方法
+
+```java
+BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("test.txt", true));
+// 写出数据
+ bufferedWriter.write("hihihi");
+// 写出换行
+ bufferedWriter.newLine();
+ bufferedWriter.write("wowowow");
+ bufferedWriter.newLine();
+ bufferedWriter.close();
+```
