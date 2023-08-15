@@ -430,5 +430,50 @@ osw2.close();
 
 ### 转换流理解图解
 
-**转换流是字节与字符间的桥梁！**![2_zhuanhuan.jpg](img%2F2_zhuanhuan.jpg)
+**转换流是字节与字符间的桥梁！**![2_zhuanhuan.jpg](img/2_zhuanhuan.jpg)
 
+# 序列化
+
+Java 提供了一种对象**序列化**的机制。用一个字节序列可以表示一个对象，该字节序列包含该`对象的数据`、`对象的类型`和`对象中存储的属性`等信息。字节序列写出到文件之后，相当于文件中**持久保存**了一个对象的信息。 
+
+反之，该字节序列还可以从文件中读取回来，重构对象，对它进行**反序列化**。`对象的数据`、`对象的类型`和`对象中存储的数据`信息，都可以用来在内存中创建对象。看图理解序列化： ![](/Users/joey/Downloads/资料/day29-IO（其他流）/笔记/img/3_xuliehua.jpg)
+
+## ObjectOutputStream
+
+* `public ObjectOutputStream(OutputStream out) `： 创建一个指定OutputStream的ObjectOutputStream。
+
+### 序列化操作
+
+1. 一个对象要想序列化，必须满足两个条件:
+
+* 该类必须实现`java.io.Serializable ` 接口，`Serializable` 是一个标记接口，不实现此接口的类将不会使任何状态序列化或反序列化，会抛出`NotSerializableException` 。
+* 该类的所有属性必须是可序列化的。如果有一个属性不需要可序列化的，则该属性必须注明是瞬态的，使用`transient` 关键字修饰。
+
+```java
+public class Student implements Serializable {
+    private String name;
+    private int age;
+}
+```
+
+- `public final void writeObject (Object obj)` : 将指定的对象写出。
+
+```java
+Student stu = new Student("张三", 23);
+ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("test.txt", true));
+objectOutputStream.writeObject(stu);
+objectOutputStream.close();
+```
+
+## ObjectInputStream
+
+ObjectInputStream反序列化流，将之前使用ObjectOutputStream序列化的原始数据恢复为对象。
+
+* `public ObjectInputStream(InputStream in) `： 创建一个指定InputStream的ObjectInputStream。
+
+```java
+ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("test.txt"));
+Student o = (Student) objectInputStream.readObject();
+System.out.println(o);
+objectInputStream.close();
+```
